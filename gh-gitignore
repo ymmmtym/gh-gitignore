@@ -16,4 +16,4 @@ fi
 
 curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} > .gitignore
 
-echo "✓ Downloaded ${NAME} to .gitignore"
+echo "✓ Downloaded ${NAME} to ${PWD}/.gitignore"
