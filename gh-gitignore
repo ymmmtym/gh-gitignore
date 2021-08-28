@@ -9,6 +9,11 @@ fi
 REPO="github/gitignore"
 NAME=$(gh api repos/${REPO}/contents --jq .[].name | grep ".gitignore" | fzf)
 
+if [[ ${NAME} = "" ]];then
+  echo -e "error: no file selected.\n\nPlease select .gitignore file to download"
+  exit 1
+fi
+
 curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} > .gitignore
 
 echo "✓ Downloaded ${NAME} to .gitignore"
