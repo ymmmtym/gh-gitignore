@@ -1,0 +1,14 @@
+#!/bin/bash
+
+type fzf >/dev/null 2>&1
+if [[ ! $? = 0 ]]; then
+  echo -e  "error: fzf command is not found.\n\nPlease install fzf command.\n ex) brew install fzf"
+  exit 1
+fi
+
+REPO="github/gitignore"
+NAME=$(gh api repos/${REPO}/contents --jq .[].name | grep ".gitignore" | fzf)
+
+curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} > .gitignore
+
+echo "✓ Downloaded ${NAME} to .gitignore"
