@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+args=("$@")
+ if [ $# -eq 0 ]; then
+     echo "No arguments supplied, is a bash script to copy .gittignore file from available  source default source is github/gitignore "
+     echo "call wuth argument < name of .gittignore as node, python, etc > or -h|--help option to show usage"
+     echo "comment to @tst32"
+     exit 0
+ fi
+
+command -v gh >/dev/null 2>&1 || { echo >&2 "require gh (https://cli.github.com/) tool, but it's not installed.  Aborting."; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo >&2 "require jq (https://stedolan.github.io/jq/) tool, but it's not installed.  Aborting."; exit 1; }
+
+ argument=${args[0]}
+ if  [[ $argument == *"--help"* || $argument == *"-h"* ]]; then
+     echo 'usage: gh gitignore < name of .gittignore as node, python, etc > -- will search <name> for download at github/gitignore repository'
+     echo 'advanced usage: gh gitignore -s <repowner/reponame> < name of .gittignore as node, python, etc will search <name> for download at repowner/reponame repository>'
+     echo 'extension require jq (https://stedolan.github.io/jq/) tool '
+ exit 0
+ fi
+
+ if  [[ $argument == *"--source"* || $argument == *"-s"* ]]; then
+     
+     REPO=${args[1]}
+     printf "provided custom source  - $REPO "
+     argument=${args[2]} 
+     printf "will search for $argument "  
+ fi
+
+ if [[ -z "$REPO" ]]; then
+   REPO="github/gitignore"
+   printf "default source github/gitignore, will search for $argument"
+ fi
+
+CONTENT=$(gh api repos/${REPO}/contents --jq .[].name | grep ".gitignore" |tr '\n' ', ')
+NAME=$(gh api repos/${REPO}/contents --jq .[].name | grep ".gitignore" | grep -i "$argument")
+
+printf "try to found $NAME"
+echo -e  ""
+
+ if [[ ${NAME} = "" ]];then
+  echo -e "error: no file selected.\n\n Please select .gitignore file to download. look at possible options:"
+  printf "$CONTENT \b\b\b"
+  echo -e  ""
+  exit 1
+ fi
+
+curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} > .gitignore
+
+echo "✓ Downloaded ${NAME} to ${PWD}/.gitignore"
