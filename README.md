@@ -9,6 +9,13 @@ gh extension install ymmmtym/gh-gitignore
 gh gitignore
 ```
 
+By default the selected template overwrites `.gitignore`. To keep the existing
+file and append the template instead, set `APPEND=1`:
+
+```bash
+APPEND=1 gh gitignore
+```
+
 ## Authentication
 
 This extension reads the authentication token with `gh auth token` and calls the
