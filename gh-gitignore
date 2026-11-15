@@ -6,6 +6,12 @@ if [[ ! $? = 0 ]]; then
   exit 1
 fi
 
+TOKEN=$(gh auth token 2>/dev/null)
+if [[ ${TOKEN} = "" ]]; then
+  echo -e "error: failed to get the authentication token.\n\nPlease run 'gh auth login' first."
+  exit 1
+fi
+
 REPO="github/gitignore"
 NAME=$(gh api repos/${REPO}/contents --jq .[].name | grep ".gitignore" | fzf)
 
@@ -14,6 +20,6 @@ if [[ ${NAME} = "" ]];then
   exit 1
 fi
 
-curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} > .gitignore
+curl -s -H "Authorization: token ${TOKEN}" https://raw.githubusercontent.com/${REPO}/master/${NAME} > .gitignore
 
 echo "✓ Downloaded ${NAME} to ${PWD}/.gitignore"
