@@ -6,6 +6,14 @@ if [[ ! $? = 0 ]]; then
   exit 1
 fi
 
+# `gh auth token` resolves the token from the system keyring (macOS Keychain,
+# GNOME Keyring, Wincred) as well as from GH_TOKEN/GITHUB_TOKEN, so it keeps
+# working now that gh stores credentials in encrypted storage.
+if ! gh auth token >/dev/null 2>&1; then
+  echo -e "error: no GitHub authentication token found.\n\nPlease run 'gh auth login' to authenticate."
+  exit 1
+fi
+
 REPO="github/gitignore"
 NAME=$(gh api repos/${REPO}/contents --jq .[].name | grep ".gitignore" | fzf)
 
