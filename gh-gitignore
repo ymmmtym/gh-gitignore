@@ -22,6 +22,18 @@ if [[ ${NAME} = "" ]];then
   exit 1
 fi
 
-curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} > .gitignore
+DEST=".gitignore"
 
-echo "✓ Downloaded ${NAME} to ${PWD}/.gitignore"
+# By default the selected template overwrites ${DEST}. Set APPEND=1 to append
+# to the existing file instead of replacing it.
+if [[ ${APPEND} = "1" ]]; then
+  # Avoid gluing the template onto a file that does not end with a newline.
+  if [[ -s ${DEST} && -n "$(tail -c 1 ${DEST})" ]]; then
+    printf '\n' >> "${DEST}"
+  fi
+  curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} >> "${DEST}"
+  echo "✓ Appended ${NAME} to ${PWD}/${DEST}"
+else
+  curl -s https://raw.githubusercontent.com/${REPO}/master/${NAME} > "${DEST}"
+  echo "✓ Downloaded ${NAME} to ${PWD}/${DEST}"
+fi
